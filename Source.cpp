@@ -1,6 +1,16 @@
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 
+bool isCollided(olc::vd2d& aPos, olc::vd2d& aRad, olc::vd2d& bPos, olc::vd2d& bRad)
+{
+	return (
+		(aPos.x + aRad.x < bPos.x - bRad.x &&
+		aPos.y + aRad.y < bPos.y - bRad.y) ||
+		(aPos.x - aRad.x > bPos.x + bRad.x &&
+		aPos.y - aRad.y > bPos.y + bRad.y)
+	);
+}
+
 class BrickBreaker : public olc::PixelGameEngine
 {
 public:
@@ -17,9 +27,10 @@ public:
 
 	olc::vd2d playerSize = { 80.0, 32.0 };
 
-	olc::vi2d playerRadius = { playerSize.x / 2, playerSize.y / 2 };
+	olc::vd2d playerRadius = { playerSize.x / 2, playerSize.y / 2 };
+	olc::vd2d ballRadius = { 5, 5 };
 	
-	float playerVel = 200.0f;
+	float playerVel = 500.0f;
 
 public:
 	bool OnUserCreate() override
@@ -47,6 +58,8 @@ public:
 			playerPos.x = playerRadius.x;
 		if (playerPos.x + playerRadius.x >= fieldSize.x)
 			playerPos.x = fieldSize.x - playerRadius.x - 1;
+		if (isCollided(ballPos, ballRadius, playerPos, playerRadius))
+			playerVel = -playerVel;
 
 		// Draw
 		Clear(olc::GREY);
